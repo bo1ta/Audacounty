@@ -13,7 +13,7 @@ class SelectionOverlayView: UIView {
 
   override func draw(_ rect: CGRect) {
     guard let start = startPoint, let end = endPoint else { return }
-
+    
     let selectionPath = UIBezierPath(rect: CGRect(
       x: min(start.x, end.x),
       y: 0,
@@ -23,11 +23,19 @@ class SelectionOverlayView: UIView {
 
     UIColor.systemBlue.withAlphaComponent(0.3).setFill()
     selectionPath.fill()
+
+    print("S_A DESENAT")
   }
 
   func updateSelection(start: CGPoint?, end: CGPoint?) {
     startPoint = start
     endPoint = end
+    setNeedsDisplay()
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+
     setNeedsDisplay()
   }
 }

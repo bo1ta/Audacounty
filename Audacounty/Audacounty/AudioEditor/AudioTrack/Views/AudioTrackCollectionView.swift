@@ -6,40 +6,37 @@
 //
 
 import UIKit
-import Combine
+
+protocol AudioTrackCollectionViewDelegate: AnyObject {
+  func audioTrackCollectionView(_ collectionView: AudioTrackCollectionView, didSelectTimeRange start: Double, end: Double)
+}
 
 class AudioTrackCollectionView: UICollectionView {
-  enum Event {
-    case onUpdateTimeSelection(start: Double, end: Double)
-  }
+  public weak var selectionDelegate: AudioTrackCollectionViewDelegate?
 
-  private var selectionOverlay: SelectionOverlayView?
   private var timeScale: Double = 44100.0 // samples per point
-  private let eventSubject = PassthroughSubject<Event, Never>()
 
-  public var eventPublisher: AnyPublisher<Event, Never> {
-    eventSubject.eraseToAnyPublisher()
-  }
+  private lazy var selectionOverlay: SelectionOverlayView = {
+    let selectionOverlay = SelectionOverlayView(frame: .zero)
+    selectionOverlay.backgroundColor = .clear
+    selectionOverlay.isUserInteractionEnabled = false
+    selectionOverlay.translatesAutoresizingMaskIntoConstraints = false
+    return selectionOverlay
+  }()
 
-  private func setupSelectionGesture() {
+  func setupUI() {
     let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
     addGestureRecognizer(panGesture)
 
-    selectionOverlay = SelectionOverlayView()
-    selectionOverlay?.backgroundColor = .clear
-    selectionOverlay?.isUserInteractionEnabled = false
-    selectionOverlay?.translatesAutoresizingMaskIntoConstraints = false
+    superview?.addSubview(selectionOverlay)
+    superview?.bringSubviewToFront(selectionOverlay)
 
-    if let overlay = selectionOverlay {
-      addSubview(overlay)
-
-      NSLayoutConstraint.activate([
-        overlay.topAnchor.constraint(equalTo: topAnchor),
-        overlay.bottomAnchor.constraint(equalTo: bottomAnchor),
-        overlay.leadingAnchor.constraint(equalTo: leadingAnchor),
-        overlay.trailingAnchor.constraint(equalTo: trailingAnchor)
-      ])
-    }
+    NSLayoutConstraint.activate([
+      selectionOverlay.topAnchor.constraint(equalTo: topAnchor),
+      selectionOverlay.bottomAnchor.constraint(equalTo: bottomAnchor),
+      selectionOverlay.leadingAnchor.constraint(equalTo: leadingAnchor),
+      selectionOverlay.trailingAnchor.constraint(equalTo: trailingAnchor)
+    ])
   }
 
   @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
@@ -47,15 +44,15 @@ class AudioTrackCollectionView: UICollectionView {
 
     switch gesture.state {
     case .began:
-      selectionOverlay?.updateSelection(start: point, end: point)
+      selectionOverlay.updateSelection(start: point, end: point)
     case .changed:
-      selectionOverlay?.updateSelection(start: selectionOverlay?.startPoint, end: point)
+      selectionOverlay.updateSelection(start: selectionOverlay.startPoint, end: point)
 
       // Convert point to time
-      let startTime = (selectionOverlay?.startPoint?.x ?? 0) * timeScale
+      let startTime = (selectionOverlay.startPoint?.x ?? 0) * timeScale
       let endTime = point.x * timeScale
 
-      eventSubject.send(.onUpdateTimeSelection(start: startTime, end: endTime))
+      selectionDelegate?.audioTrackCollectionView(self, didSelectTimeRange: startTime, end: endTime)
 
     case .ended:
       // Finalize selection

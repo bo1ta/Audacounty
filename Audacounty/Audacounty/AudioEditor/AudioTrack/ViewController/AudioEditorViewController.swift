@@ -7,16 +7,12 @@
 
 import Foundation
 import UIKit
+import AVFoundation
+import Combine
 
 class AudioEditorViewController: UIViewController {
 
   // MARK: Subviews
-
-  private lazy var label: UILabel = {
-    let label = UILabel()
-    label.text = "Hello world"
-    return label
-  }()
 
   private let controlsStackView: UIStackView = {
     let stack = UIStackView()
@@ -28,13 +24,13 @@ class AudioEditorViewController: UIViewController {
     return stack
   }()
 
-  private let tracksCollectionView: UICollectionView = {
+  private let tracksCollectionView: AudioTrackCollectionView = {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .vertical
     layout.minimumLineSpacing = 8
     layout.minimumInteritemSpacing = 0
 
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    let collectionView = AudioTrackCollectionView(frame: .zero, collectionViewLayout: layout)
     collectionView.backgroundColor = .systemBackground
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.alwaysBounceVertical = true
@@ -46,10 +42,31 @@ class AudioEditorViewController: UIViewController {
   private lazy var stopButton: UIButton = createControlButton(title: "Stop", symbol: "stop.fill")
   private lazy var recordButton: UIButton = createControlButton(title: "Record", symbol: "record.circle")
 
+  // MARK: DataSource
+
+  enum Section {
+    case main
+  }
+
+  typealias DataSource = UICollectionViewDiffableDataSource<Section, AudioTrack>
+  typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AudioTrack>
+
+  private lazy var dataSource: DataSource = {
+    let dataSource = DataSource(collectionView: tracksCollectionView) { collectionView, indexPath, item in
+      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AudioTrackCell.reuseIdentifier, for: indexPath) as? AudioTrackCell
+      if let audioTrack = self.audioTracks[safe: indexPath.item] {
+        cell?.audioTrack = audioTrack
+      }
+      return cell
+    }
+
+    return dataSource
+  }()
+
   // MARK: Init
 
   private let audioFilePicker: AudioFilePicker
-  private var pickedAudioURLs: [URL] = []
+  private var audioTracks: [AudioTrack] = []
 
   init(audioFilePicker: AudioFilePicker = AudioFilePicker()) {
     self.audioFilePicker = audioFilePicker
@@ -81,6 +98,8 @@ class AudioEditorViewController: UIViewController {
     view.addSubview(controlsStackView)
     view.addSubview(tracksCollectionView)
 
+    tracksCollectionView.setupUI()
+
     NSLayoutConstraint.activate([
       controlsStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
       controlsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -96,8 +115,9 @@ class AudioEditorViewController: UIViewController {
 
   private func setupCollectionView() {
     tracksCollectionView.delegate = self
-    tracksCollectionView.dataSource = self
-    tracksCollectionView.register(AudioTrackCell.self, forCellWithReuseIdentifier: "AudioTrackCell")
+    tracksCollectionView.dataSource = dataSource
+    tracksCollectionView.selectionDelegate = self
+    tracksCollectionView.register(AudioTrackCell.self, forCellWithReuseIdentifier: AudioTrackCell.reuseIdentifier)
   }
 
   private func createControlButton(title: String, symbol: String) -> UIButton {
@@ -123,31 +143,42 @@ class AudioEditorViewController: UIViewController {
 
 extension AudioEditorViewController: AudioFilePickerDelegate {
   func audioFilePicker(didPickAudioFilesAt urls: [URL]) {
-    pickedAudioURLs = urls
+    let pickedAudioTracks = urls.compactMap { createAudioTrack(from: $0) }
+    audioTracks.append(contentsOf: pickedAudioTracks)
+    applySnapshot()
+  }
 
-    DispatchQueue.main.async {
-      self.tracksCollectionView.reloadData()
+  private func createAudioTrack(from  url: URL) -> AudioTrack? {
+    do {
+      let assetReader = try AVAssetReader(asset: AVURLAsset(url: url))
+      let duration = assetReader.asset.duration.seconds
+      return AudioTrack(url: url, duration: duration)
+    } catch {
+      print("Failed to create audio track for url: \(url): \(error.localizedDescription)")
+      return nil
     }
+  }
+
+  private func applySnapshot(animating: Bool = true) {
+    var snapshot = Snapshot()
+    snapshot.appendSections([.main])
+    snapshot.appendItems(audioTracks)
+    dataSource.apply(snapshot, animatingDifferences: animating)
   }
 }
 
-// MARK: - UICollectionViewDelegate + UICollectionViewDataSource + UICollectionViewDelegateFlowLayout
+// MARK: - AudioTrackCollectionViewDelegate
 
-extension AudioEditorViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return pickedAudioURLs.count
+extension AudioEditorViewController: AudioTrackCollectionViewDelegate {
+  func audioTrackCollectionView(_ collectionView: AudioTrackCollectionView, didSelectTimeRange start: Double, end: Double) {
+    print("START: \(start) and FINISH: \(end)")
   }
+}
 
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AudioTrackCell", for: indexPath) as! AudioTrackCell
+// MARK: - UICollectionViewDelegateFlowLayout
 
-    if let url = pickedAudioURLs[safe: indexPath.item] {
-      cell.updateWaveformForURL(url)
-    }
-    return cell
-  }
-
+extension AudioEditorViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return CGSize(width: collectionView.bounds.width, height: 100) // Adjust height as needed
+    return CGSize(width: collectionView.bounds.width, height: 100)
   }
 }

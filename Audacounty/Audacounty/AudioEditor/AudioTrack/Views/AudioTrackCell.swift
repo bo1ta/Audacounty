@@ -10,6 +10,8 @@ import DSWaveformImage
 import DSWaveformImageViews
 
 class AudioTrackCell: UICollectionViewCell {
+  public static let reuseIdentifier = "AudioTrackCell"
+
   private let waveformImageDrawer = WaveformImageDrawer()
 
   private let imageView: WaveformImageView = {
@@ -19,6 +21,14 @@ class AudioTrackCell: UICollectionViewCell {
     imageView.layer.cornerRadius = 8
     return imageView
   }()
+
+  var audioTrack: AudioTrack? {
+    didSet {
+      if let audioURL = audioTrack?.url {
+        imageView.waveformAudioURL = audioURL
+      }
+    }
+  }
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -38,10 +48,6 @@ class AudioTrackCell: UICollectionViewCell {
       imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
       imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
     ])
-  }
-
-  func updateWaveformForURL(_ audioURL: URL) {
-    imageView.waveformAudioURL = audioURL
   }
 }
 

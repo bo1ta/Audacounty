@@ -1,5 +1,5 @@
 //
-//  DocumentPickerWrapper.swift
+//  AudioFilePicker.swift
 //  Audacounty
 //
 //  Created by Solomon Alexandru on 22.01.2025.
@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import AVFoundation
+import SwiftUI
 
 protocol AudioFilePickerDelegate: AnyObject {
   func audioFilePicker(didPickAudioFilesAt urls: [URL])
