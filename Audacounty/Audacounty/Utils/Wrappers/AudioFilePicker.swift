@@ -5,14 +5,18 @@
 //  Created by Solomon Alexandru on 22.01.2025.
 //
 
-import Foundation
-import UIKit
 import AVFoundation
+import Foundation
 import SwiftUI
+import UIKit
+
+// MARK: - AudioFilePickerDelegate
 
 protocol AudioFilePickerDelegate: AnyObject {
   func audioFilePicker(didPickAudioFilesAt urls: [URL])
 }
+
+// MARK: - AudioFilePicker
 
 public class AudioFilePicker: NSObject, UIDocumentPickerDelegate {
   private static let documentContentTypes: [UTType] = [.aiff, .mp3, .mpeg4Audio]
@@ -26,7 +30,7 @@ public class AudioFilePicker: NSObject, UIDocumentPickerDelegate {
     return documentPicker
   }
 
-  public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+  public func documentPicker(_: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
     delegate?.audioFilePicker(didPickAudioFilesAt: urls)
   }
 }

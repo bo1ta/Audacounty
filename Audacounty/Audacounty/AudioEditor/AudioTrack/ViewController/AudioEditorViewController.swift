@@ -5,13 +5,14 @@
 //  Created by Solomon Alexandru on 21.01.2025.
 //
 
-import Foundation
-import UIKit
 import AVFoundation
 import Combine
+import Foundation
+import UIKit
+
+// MARK: - AudioEditorViewController
 
 class AudioEditorViewController: UIViewController {
-
   // MARK: Subviews
 
   private let controlsStackView: UIStackView = {
@@ -51,17 +52,15 @@ class AudioEditorViewController: UIViewController {
   typealias DataSource = UICollectionViewDiffableDataSource<Section, AudioTrack>
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AudioTrack>
 
-  private lazy var dataSource: DataSource = {
-    let dataSource = DataSource(collectionView: tracksCollectionView) { collectionView, indexPath, item in
-      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AudioTrackCell.reuseIdentifier, for: indexPath) as? AudioTrackCell
-      if let audioTrack = self.audioTracks[safe: indexPath.item] {
-        cell?.audioTrack = audioTrack
-      }
-      return cell
+  private lazy var dataSource = DataSource(collectionView: tracksCollectionView) { collectionView, indexPath, _ in
+    let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: AudioTrackCell.reuseIdentifier,
+      for: indexPath) as? AudioTrackCell
+    if let audioTrack = self.audioTracks[safe: indexPath.item] {
+      cell?.audioTrack = audioTrack
     }
-
-    return dataSource
-  }()
+    return cell
+  }
 
   // MARK: Init
 
@@ -70,18 +69,22 @@ class AudioEditorViewController: UIViewController {
 
   init(audioFilePicker: AudioFilePicker = AudioFilePicker()) {
     self.audioFilePicker = audioFilePicker
+
     super.init(nibName: nil, bundle: nil)
+
     self.audioFilePicker.delegate = self
   }
-  
-  required init?(coder: NSCoder) {
+
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   // MARK: Lifecycle
 
   override func viewDidLoad() {
     super.viewDidLoad()
+
     setupUI()
     setupCollectionView()
   }
@@ -91,13 +94,12 @@ class AudioEditorViewController: UIViewController {
   private func setupUI() {
     view.backgroundColor = .systemBackground
 
-    [playButton, pauseButton, stopButton, recordButton].forEach {
-      controlsStackView.addArrangedSubview($0)
+    for item in [playButton, pauseButton, stopButton, recordButton] {
+      controlsStackView.addArrangedSubview(item)
     }
 
     view.addSubview(controlsStackView)
     view.addSubview(tracksCollectionView)
-
     tracksCollectionView.setupUI()
 
     NSLayoutConstraint.activate([
@@ -109,7 +111,7 @@ class AudioEditorViewController: UIViewController {
       tracksCollectionView.topAnchor.constraint(equalTo: controlsStackView.bottomAnchor, constant: 16),
       tracksCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       tracksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      tracksCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+      tracksCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
   }
 
@@ -133,13 +135,14 @@ class AudioEditorViewController: UIViewController {
     return button
   }
 
-  @objc private func showAudioFilePicker() {
+  @objc
+  private func showAudioFilePicker() {
     let controller = audioFilePicker.getViewController()
     present(controller, animated: true)
   }
 }
 
-// MARK: - AudioFilePickerDelegate
+// MARK: AudioFilePickerDelegate
 
 extension AudioEditorViewController: AudioFilePickerDelegate {
   func audioFilePicker(didPickAudioFilesAt urls: [URL]) {
@@ -148,7 +151,7 @@ extension AudioEditorViewController: AudioFilePickerDelegate {
     applySnapshot()
   }
 
-  private func createAudioTrack(from  url: URL) -> AudioTrack? {
+  private func createAudioTrack(from url: URL) -> AudioTrack? {
     do {
       let assetReader = try AVAssetReader(asset: AVURLAsset(url: url))
       let duration = assetReader.asset.duration.seconds
@@ -167,18 +170,23 @@ extension AudioEditorViewController: AudioFilePickerDelegate {
   }
 }
 
-// MARK: - AudioTrackCollectionViewDelegate
+// MARK: AudioTrackCollectionViewDelegate
 
 extension AudioEditorViewController: AudioTrackCollectionViewDelegate {
-  func audioTrackCollectionView(_ collectionView: AudioTrackCollectionView, didSelectTimeRange start: Double, end: Double) {
+  func audioTrackCollectionView(_: AudioTrackCollectionView, didSelectTimeRange start: Double, end: Double) {
     print("START: \(start) and FINISH: \(end)")
   }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout
+// MARK: UICollectionViewDelegateFlowLayout
 
 extension AudioEditorViewController: UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return CGSize(width: collectionView.bounds.width, height: 100)
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout _: UICollectionViewLayout,
+    sizeForItemAt _: IndexPath)
+    -> CGSize
+  {
+    CGSize(width: collectionView.bounds.width, height: 100)
   }
 }

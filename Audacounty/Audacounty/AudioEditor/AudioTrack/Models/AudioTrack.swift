@@ -22,7 +22,7 @@ struct AudioTrack: Hashable {
     hasher.combine(id)
   }
 
-  static func == (_ lhs: AudioTrack, rhs: AudioTrack) -> Bool {
+  static func ==(_ lhs: AudioTrack, rhs: AudioTrack) -> Bool {
     lhs.id == rhs.id
   }
 }
