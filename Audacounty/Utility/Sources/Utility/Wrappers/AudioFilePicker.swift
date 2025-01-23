@@ -12,7 +12,7 @@ import UIKit
 
 // MARK: - AudioFilePickerDelegate
 
-protocol AudioFilePickerDelegate: AnyObject {
+public protocol AudioFilePickerDelegate: AnyObject {
   func audioFilePicker(didPickAudioFilesAt urls: [URL])
 }
 
@@ -21,7 +21,7 @@ protocol AudioFilePickerDelegate: AnyObject {
 public class AudioFilePicker: NSObject, UIDocumentPickerDelegate {
   private static let documentContentTypes: [UTType] = [.aiff, .mp3, .mpeg4Audio]
 
-  weak var delegate: AudioFilePickerDelegate?
+  public weak var delegate: AudioFilePickerDelegate?
 
   public func getViewController() -> UIDocumentPickerViewController {
     let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: Self.documentContentTypes, asCopy: true)

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		BC3E1AA52D406FEB0032E3CD /* DSWaveformImage in Frameworks */ = {isa = PBXBuildFile; productRef = BC3E1AA42D406FEB0032E3CD /* DSWaveformImage */; };
 		BC3E1AA72D406FEB0032E3CD /* DSWaveformImageViews in Frameworks */ = {isa = PBXBuildFile; productRef = BC3E1AA62D406FEB0032E3CD /* DSWaveformImageViews */; };
+		BCB8619D2D42F76500287590 /* AudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = BCB8619C2D42F76500287590 /* AudioEngine */; };
+		BCB861A02D42F7B300287590 /* Utility in Frameworks */ = {isa = PBXBuildFile; productRef = BCB8619F2D42F7B300287590 /* Utility */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,8 +72,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCB8619D2D42F76500287590 /* AudioEngine in Frameworks */,
 				BC3E1AA72D406FEB0032E3CD /* DSWaveformImageViews in Frameworks */,
 				BC3E1AA52D406FEB0032E3CD /* DSWaveformImage in Frameworks */,
+				BCB861A02D42F7B300287590 /* Utility in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,6 +139,8 @@
 			packageProductDependencies = (
 				BC3E1AA42D406FEB0032E3CD /* DSWaveformImage */,
 				BC3E1AA62D406FEB0032E3CD /* DSWaveformImageViews */,
+				BCB8619C2D42F76500287590 /* AudioEngine */,
+				BCB8619F2D42F7B300287590 /* Utility */,
 			);
 			productName = Audacounty;
 			productReference = BC3E1A5F2D4049D10032E3CD /* Audacounty.app */;
@@ -220,6 +226,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				BC3E1AA32D406FEB0032E3CD /* XCRemoteSwiftPackageReference "DSWaveformImage" */,
+				BCB8619B2D42F76500287590 /* XCLocalSwiftPackageReference "AudioEngine" */,
+				BCB8619E2D42F7B300287590 /* XCLocalSwiftPackageReference "Utility" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BC3E1A602D4049D10032E3CD /* Products */;
@@ -606,6 +614,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		BCB8619B2D42F76500287590 /* XCLocalSwiftPackageReference "AudioEngine" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = AudioEngine;
+		};
+		BCB8619E2D42F7B300287590 /* XCLocalSwiftPackageReference "Utility" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Utility;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		BC3E1AA32D406FEB0032E3CD /* XCRemoteSwiftPackageReference "DSWaveformImage" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -627,6 +646,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BC3E1AA32D406FEB0032E3CD /* XCRemoteSwiftPackageReference "DSWaveformImage" */;
 			productName = DSWaveformImageViews;
+		};
+		BCB8619C2D42F76500287590 /* AudioEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AudioEngine;
+		};
+		BCB8619F2D42F7B300287590 /* Utility */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Utility;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
