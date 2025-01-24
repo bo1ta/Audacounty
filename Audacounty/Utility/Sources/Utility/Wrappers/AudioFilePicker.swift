@@ -27,6 +27,7 @@ public class AudioFilePicker: NSObject, UIDocumentPickerDelegate {
     let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: Self.documentContentTypes, asCopy: true)
     documentPicker.delegate = self
     documentPicker.modalPresentationStyle = .overFullScreen
+    documentPicker.allowsMultipleSelection = true
     return documentPicker
   }
 

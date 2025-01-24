@@ -11,9 +11,15 @@ let package = Package(
       name: "AudioEngine",
       targets: ["AudioEngine"]),
   ],
+  dependencies: [
+    .package(name: "Utility", path: "../Utility"),
+    .package(url: "https://github.com/hmlongco/Factory", exact: "2.4.3"),
+  ],
   targets: [
     .target(
-      name: "AudioEngine"),
+      name: "AudioEngine",
+      dependencies: ["Utility", "Factory"]
+    ),
     .testTarget(
       name: "AudioEngineTests",
       dependencies: ["AudioEngine"]),

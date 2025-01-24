@@ -9,10 +9,14 @@ import AVFoundation
 import Foundation
 import UIKit
 import Utility
+import Factory
+import AudioEngine
 
 // MARK: - AudioEditorViewController
 
 class AudioEditorViewController: UIViewController {
+  @Injected(\.audioEngine) private var audioEngine: AudioTrackEngine
+
   // MARK: Subviews
 
   private let controlsStackView: UIStackView = {
@@ -38,10 +42,10 @@ class AudioEditorViewController: UIViewController {
     return collectionView
   }()
 
-  private lazy var playButton: UIButton = createControlButton(title: "Play", symbol: "play.fill")
-  private lazy var pauseButton: UIButton = createControlButton(title: "Pause", symbol: "pause.fill")
-  private lazy var stopButton: UIButton = createControlButton(title: "Stop", symbol: "stop.fill")
-  private lazy var recordButton: UIButton = createControlButton(title: "Record", symbol: "record.circle")
+  private lazy var playButton: UIButton = createControlButton(title: "Play", symbol: "play.fill", action: #selector(playAction))
+  private lazy var pauseButton: UIButton = createControlButton(title: "Pause", symbol: "pause.fill", action: #selector(pauseAction))
+  private lazy var stopButton: UIButton = createControlButton(title: "Stop", symbol: "stop.fill", action: #selector(stopAction))
+  private lazy var recordButton: UIButton = createControlButton(title: "Record", symbol: "record.circle", action: #selector(recordAction))
 
   // MARK: DataSource
 
@@ -122,7 +126,7 @@ class AudioEditorViewController: UIViewController {
     tracksCollectionView.register(AudioTrackCell.self, forCellWithReuseIdentifier: AudioTrackCell.reuseIdentifier)
   }
 
-  private func createControlButton(title: String, symbol: String) -> UIButton {
+  private func createControlButton(title: String, symbol: String, action: Selector) -> UIButton {
     let button = UIButton(type: .system)
     var configuration = UIButton.Configuration.filled()
     configuration.image = UIImage(systemName: symbol)
@@ -130,10 +134,24 @@ class AudioEditorViewController: UIViewController {
     configuration.title = title
     button.configuration = configuration
 
-    let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(showAudioFilePicker))
+    let gestureRecognizer = UITapGestureRecognizer(target: self, action: action)
     button.addGestureRecognizer(gestureRecognizer)
     return button
   }
+
+  @objc private func playAction() {
+    audioEngine.play()
+  }
+
+  @objc private func pauseAction() {
+    showAudioFilePicker()
+  }
+
+  @objc private func stopAction() {
+    audioEngine.stop()
+  }
+
+  @objc private func recordAction() {}
 
   @objc
   private func showAudioFilePicker() {
@@ -147,6 +165,10 @@ class AudioEditorViewController: UIViewController {
 extension AudioEditorViewController: AudioFilePickerDelegate {
   func audioFilePicker(didPickAudioFilesAt urls: [URL]) {
     let pickedAudioTracks = urls.compactMap { createAudioTrack(from: $0) }
+    for track in pickedAudioTracks {
+      audioEngine.addTrackURL(track.url)
+    }
+
     audioTracks.append(contentsOf: pickedAudioTracks)
     applySnapshot()
   }

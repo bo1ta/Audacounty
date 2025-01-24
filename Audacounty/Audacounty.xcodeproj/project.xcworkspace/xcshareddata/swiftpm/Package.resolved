@@ -1,5 +1,5 @@
 {
-  "originHash" : "eb3e6467aa3b79663b371a20cbe7f1b7c7a6a3c9f98e6945bc9704361b5ae42d",
+  "originHash" : "6c7711ebaadbf193a522313af080942012da60025b487fe9922cd68b7eef0260",
   "pins" : [
     {
       "identity" : "dswaveformimage",
@@ -8,6 +8,24 @@
       "state" : {
         "revision" : "4c56578ee10128ee2b2c04c9c5aa73812de722db",
         "version" : "14.2.2"
+      }
+    },
+    {
+      "identity" : "factory",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hmlongco/Factory",
+      "state" : {
+        "revision" : "fb04a8918848e413d3921d346a23bae7f81088d9",
+        "version" : "2.4.3"
+      }
+    },
+    {
+      "identity" : "swiftybeaver",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyBeaver/SwiftyBeaver.git",
+      "state" : {
+        "revision" : "8cba041db09596183331d123f337d0eb2e6e8e91",
+        "version" : "2.1.1"
       }
     }
   ],

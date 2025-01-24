@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		BC3E1AA52D406FEB0032E3CD /* DSWaveformImage in Frameworks */ = {isa = PBXBuildFile; productRef = BC3E1AA42D406FEB0032E3CD /* DSWaveformImage */; };
 		BC3E1AA72D406FEB0032E3CD /* DSWaveformImageViews in Frameworks */ = {isa = PBXBuildFile; productRef = BC3E1AA62D406FEB0032E3CD /* DSWaveformImageViews */; };
+		BC89A6D62D4318B60049C764 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = BC89A6D52D4318B60049C764 /* Factory */; };
 		BCB8619D2D42F76500287590 /* AudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = BCB8619C2D42F76500287590 /* AudioEngine */; };
 		BCB861A02D42F7B300287590 /* Utility in Frameworks */ = {isa = PBXBuildFile; productRef = BCB8619F2D42F7B300287590 /* Utility */; };
 /* End PBXBuildFile section */
@@ -73,6 +74,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BCB8619D2D42F76500287590 /* AudioEngine in Frameworks */,
+				BC89A6D62D4318B60049C764 /* Factory in Frameworks */,
 				BC3E1AA72D406FEB0032E3CD /* DSWaveformImageViews in Frameworks */,
 				BC3E1AA52D406FEB0032E3CD /* DSWaveformImage in Frameworks */,
 				BCB861A02D42F7B300287590 /* Utility in Frameworks */,
@@ -141,6 +143,7 @@
 				BC3E1AA62D406FEB0032E3CD /* DSWaveformImageViews */,
 				BCB8619C2D42F76500287590 /* AudioEngine */,
 				BCB8619F2D42F7B300287590 /* Utility */,
+				BC89A6D52D4318B60049C764 /* Factory */,
 			);
 			productName = Audacounty;
 			productReference = BC3E1A5F2D4049D10032E3CD /* Audacounty.app */;
@@ -228,6 +231,7 @@
 				BC3E1AA32D406FEB0032E3CD /* XCRemoteSwiftPackageReference "DSWaveformImage" */,
 				BCB8619B2D42F76500287590 /* XCLocalSwiftPackageReference "AudioEngine" */,
 				BCB8619E2D42F7B300287590 /* XCLocalSwiftPackageReference "Utility" */,
+				BC89A6D42D4318B60049C764 /* XCRemoteSwiftPackageReference "Factory" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BC3E1A602D4049D10032E3CD /* Products */;
@@ -634,6 +638,14 @@
 				minimumVersion = 14.2.2;
 			};
 		};
+		BC89A6D42D4318B60049C764 /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory";
+			requirement = {
+				kind = exactVersion;
+				version = 2.4.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -646,6 +658,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BC3E1AA32D406FEB0032E3CD /* XCRemoteSwiftPackageReference "DSWaveformImage" */;
 			productName = DSWaveformImageViews;
+		};
+		BC89A6D52D4318B60049C764 /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC89A6D42D4318B60049C764 /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
 		};
 		BCB8619C2D42F76500287590 /* AudioEngine */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -11,7 +11,14 @@ let package = Package(
       name: "Utility",
       targets: ["Utility"]),
   ],
+  dependencies: [
+    .package(url: "https://github.com/SwiftyBeaver/SwiftyBeaver.git", .upToNextMajor(from: "2.0.0")),
+  ],
   targets: [
     .target(
-      name: "Utility"),
+      name: "Utility",
+      dependencies: [
+        "SwiftyBeaver",
+      ]
+    ),
   ])

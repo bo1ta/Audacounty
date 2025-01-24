@@ -1,6 +1,6 @@
 //
 //  Collection+Extension.swift
-//  Audacounty
+//  Utility
 //
 //  Created by Solomon Alexandru on 22.01.2025.
 //
