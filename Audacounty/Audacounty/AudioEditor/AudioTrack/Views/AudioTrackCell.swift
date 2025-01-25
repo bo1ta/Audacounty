@@ -7,6 +7,7 @@
 
 import DSWaveformImage
 import DSWaveformImageViews
+import AudioEngine
 import UIKit
 
 class AudioTrackCell: UICollectionViewCell {

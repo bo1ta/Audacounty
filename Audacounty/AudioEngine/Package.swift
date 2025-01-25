@@ -18,8 +18,7 @@ let package = Package(
   targets: [
     .target(
       name: "AudioEngine",
-      dependencies: ["Utility", "Factory"]
-    ),
+      dependencies: ["Utility", "Factory"]),
     .testTarget(
       name: "AudioEngineTests",
       dependencies: ["AudioEngine"]),

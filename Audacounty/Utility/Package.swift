@@ -19,6 +19,5 @@ let package = Package(
       name: "Utility",
       dependencies: [
         "SwiftyBeaver",
-      ]
-    ),
+      ]),
   ])

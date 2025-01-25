@@ -5,12 +5,12 @@
 //  Created by Solomon Alexandru on 21.01.2025.
 //
 
+import AudioEngine
 import AVFoundation
+import Factory
 import Foundation
 import UIKit
 import Utility
-import Factory
-import AudioEngine
 
 // MARK: - AudioEditorViewController
 
@@ -42,10 +42,19 @@ class AudioEditorViewController: UIViewController {
     return collectionView
   }()
 
-  private lazy var playButton: UIButton = createControlButton(title: "Play", symbol: "play.fill", action: #selector(playAction))
-  private lazy var pauseButton: UIButton = createControlButton(title: "Pause", symbol: "pause.fill", action: #selector(pauseAction))
-  private lazy var stopButton: UIButton = createControlButton(title: "Stop", symbol: "stop.fill", action: #selector(stopAction))
-  private lazy var recordButton: UIButton = createControlButton(title: "Record", symbol: "record.circle", action: #selector(recordAction))
+  private let progressLabel: UILabel = {
+    let label = UILabel()
+    label.text = "00:00"
+    label.font = UIFont.monospacedDigitSystemFont(ofSize: 16, weight: .regular)
+    label.textAlignment = .center
+    label.translatesAutoresizingMaskIntoConstraints = false
+    return label
+  }()
+
+  private lazy var playButton = createControlButton(title: "Play", symbol: "play.fill", action: #selector(playAction))
+  private lazy var pauseButton = createControlButton(title: "Pause", symbol: "pause.fill", action: #selector(pauseAction))
+  private lazy var stopButton = createControlButton(title: "Stop", symbol: "stop.fill", action: #selector(stopAction))
+  private lazy var recordButton = createControlButton(title: "Record", symbol: "record.circle", action: #selector(recordAction))
 
   // MARK: DataSource
 
@@ -70,6 +79,7 @@ class AudioEditorViewController: UIViewController {
 
   private let audioFilePicker: AudioFilePicker
   private var audioTracks: [AudioTrack] = []
+  private var playbackTimer: Timer?
 
   init(audioFilePicker: AudioFilePicker = AudioFilePicker()) {
     self.audioFilePicker = audioFilePicker
@@ -97,6 +107,8 @@ class AudioEditorViewController: UIViewController {
 
   private func setupUI() {
     view.backgroundColor = .systemBackground
+
+    controlsStackView.addArrangedSubview(progressLabel)
 
     for item in [playButton, pauseButton, stopButton, recordButton] {
       controlsStackView.addArrangedSubview(item)
@@ -131,7 +143,6 @@ class AudioEditorViewController: UIViewController {
     var configuration = UIButton.Configuration.filled()
     configuration.image = UIImage(systemName: symbol)
     configuration.imagePadding = 8
-    configuration.title = title
     button.configuration = configuration
 
     let gestureRecognizer = UITapGestureRecognizer(target: self, action: action)
@@ -139,19 +150,55 @@ class AudioEditorViewController: UIViewController {
     return button
   }
 
-  @objc private func playAction() {
+  @objc
+  private func playAction() {
     audioEngine.play()
+    schedulePlaybackTimer()
   }
 
-  @objc private func pauseAction() {
+  private func updateProgressLabel() {
+    assert(Thread.isMainThread, "Should update UI on the main thread")
+
+    guard let currentTime = audioEngine.currentTime() else {
+      playbackTimer?.invalidate()
+      playbackTimer = nil
+      return
+    }
+
+    let minutes = Int(currentTime / 60)
+    let seconds = Int(currentTime.truncatingRemainder(dividingBy: 60))
+    let timeString = String(format: "%02d:%02d", minutes, seconds)
+
+    progressLabel.text = timeString
+  }
+
+  @objc
+  private func pauseAction() {
     showAudioFilePicker()
   }
 
-  @objc private func stopAction() {
+  @objc
+  private func stopAction() {
     audioEngine.stop()
+    resetPlaybackTimer()
   }
 
-  @objc private func recordAction() {}
+  private func schedulePlaybackTimer() {
+    playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+      self?.updateProgressLabel()
+    }
+    if let playbackTimer {
+      RunLoop.main.add(playbackTimer, forMode: .common)
+    }
+  }
+
+  private func resetPlaybackTimer() {
+    playbackTimer?.invalidate()
+        playbackTimer = nil
+  }
+
+  @objc
+  private func recordAction() { }
 
   @objc
   private func showAudioFilePicker() {
@@ -166,7 +213,7 @@ extension AudioEditorViewController: AudioFilePickerDelegate {
   func audioFilePicker(didPickAudioFilesAt urls: [URL]) {
     let pickedAudioTracks = urls.compactMap { createAudioTrack(from: $0) }
     for track in pickedAudioTracks {
-      audioEngine.addTrackURL(track.url)
+      audioEngine.addTrack(track)
     }
 
     audioTracks.append(contentsOf: pickedAudioTracks)
