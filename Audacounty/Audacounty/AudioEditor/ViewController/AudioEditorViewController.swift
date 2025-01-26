@@ -16,6 +16,7 @@ import Utility
 
 class AudioEditorViewController: UIViewController {
   @Injected(\.audioEngine) private var audioEngine: AudioTrackEngine
+  @Injected(\.audioFilePicker) private var filePicker: AudioFilePicker
 
   // MARK: Subviews
 
@@ -87,17 +88,14 @@ class AudioEditorViewController: UIViewController {
 
   // MARK: Init
 
-  private let audioFilePicker: AudioFilePicker
   private var audioTracks: [AudioTrack] = []
   private var playbackTimer: Timer?
   private var playheadLeadingConstraint: NSLayoutConstraint?
 
-  init(audioFilePicker: AudioFilePicker = AudioFilePicker()) {
-    self.audioFilePicker = audioFilePicker
-
+  init() {
     super.init(nibName: nil, bundle: nil)
 
-    self.audioFilePicker.delegate = self
+    filePicker.delegate = self
   }
 
   @available(*, unavailable)
@@ -231,7 +229,7 @@ class AudioEditorViewController: UIViewController {
 
   @objc
   private func showAudioFilePicker() {
-    let controller = audioFilePicker.getViewController()
+    let controller = filePicker.getViewController()
     present(controller, animated: true)
   }
 }

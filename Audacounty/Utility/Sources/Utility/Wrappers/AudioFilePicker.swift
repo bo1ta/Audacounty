@@ -23,6 +23,12 @@ public class AudioFilePicker: NSObject, UIDocumentPickerDelegate {
 
   public weak var delegate: AudioFilePickerDelegate?
 
+  /// overriding just to make it nonisolated, so the compiler doesn't complain when initialising it in `Factory.Container`
+  ///
+  nonisolated override public init() {
+    super.init()
+  }
+
   public func getViewController() -> UIDocumentPickerViewController {
     let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: Self.documentContentTypes, asCopy: true)
     documentPicker.delegate = self

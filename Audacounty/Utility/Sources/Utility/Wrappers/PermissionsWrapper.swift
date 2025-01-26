@@ -7,8 +7,8 @@
 
 import AVFoundation
 
-public struct PermissionsWrapper {
-  public func requestRecordPermissions() async -> Bool {
+public enum PermissionsWrapper {
+  public static func requestRecordPermissions() async -> Bool {
     await AVAudioApplication.requestRecordPermission()
   }
 }

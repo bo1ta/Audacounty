@@ -13,11 +13,13 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/SwiftyBeaver/SwiftyBeaver.git", .upToNextMajor(from: "2.0.0")),
+    .package(url: "https://github.com/hmlongco/Factory", exact: "2.4.3"),
   ],
   targets: [
     .target(
       name: "Utility",
       dependencies: [
         "SwiftyBeaver",
+        "Factory",
       ]),
   ])
