@@ -51,6 +51,16 @@ class AudioEditorViewController: UIViewController {
     return label
   }()
 
+  private lazy var progressNeedleView: UIView = {
+    let view = UIView()
+    view.backgroundColor = .red
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.alpha = 0.5
+    view.layer.zPosition = 100
+    view.isHidden = true
+    return view
+  }()
+
   private lazy var playButton = createControlButton(title: "Play", symbol: "play.fill", action: #selector(playAction))
   private lazy var pauseButton = createControlButton(title: "Pause", symbol: "pause.fill", action: #selector(pauseAction))
   private lazy var stopButton = createControlButton(title: "Stop", symbol: "stop.fill", action: #selector(stopAction))
@@ -80,6 +90,7 @@ class AudioEditorViewController: UIViewController {
   private let audioFilePicker: AudioFilePicker
   private var audioTracks: [AudioTrack] = []
   private var playbackTimer: Timer?
+  private var progressNeedleLeadingConstraint: NSLayoutConstraint?
 
   init(audioFilePicker: AudioFilePicker = AudioFilePicker()) {
     self.audioFilePicker = audioFilePicker
@@ -118,6 +129,11 @@ class AudioEditorViewController: UIViewController {
     view.addSubview(tracksCollectionView)
     tracksCollectionView.setupUI()
 
+    view.addSubview(progressNeedleView)
+
+    progressNeedleLeadingConstraint = progressNeedleView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+    progressNeedleLeadingConstraint?.isActive = true
+
     NSLayoutConstraint.activate([
       controlsStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
       controlsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -128,6 +144,10 @@ class AudioEditorViewController: UIViewController {
       tracksCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       tracksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
       tracksCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
+      progressNeedleView.widthAnchor.constraint(equalToConstant: 2),
+      progressNeedleView.topAnchor.constraint(equalTo: tracksCollectionView.topAnchor),
+      progressNeedleView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
     ])
   }
 
@@ -138,7 +158,7 @@ class AudioEditorViewController: UIViewController {
     tracksCollectionView.register(AudioTrackCell.self, forCellWithReuseIdentifier: AudioTrackCell.reuseIdentifier)
   }
 
-  private func createControlButton(title: String, symbol: String, action: Selector) -> UIButton {
+  private func createControlButton(title _: String, symbol: String, action: Selector) -> UIButton {
     let button = UIButton(type: .system)
     var configuration = UIButton.Configuration.filled()
     configuration.image = UIImage(systemName: symbol)
@@ -154,22 +174,31 @@ class AudioEditorViewController: UIViewController {
   private func playAction() {
     audioEngine.play()
     schedulePlaybackTimer()
+    progressNeedleView.isHidden = false
   }
 
   private func updateProgressLabel() {
     assert(Thread.isMainThread, "Should update UI on the main thread")
 
-    guard let currentTime = audioEngine.currentTime() else {
+    guard
+      let currentTime = audioEngine.getCurrentTime(),
+      let totalDuration = audioEngine.getTotalDuration()
+    else {
       playbackTimer?.invalidate()
       playbackTimer = nil
+      progressNeedleView.isHidden = true
       return
     }
 
+    /// Update progress text
     let minutes = Int(currentTime / 60)
     let seconds = Int(currentTime.truncatingRemainder(dividingBy: 60))
     let timeString = String(format: "%02d:%02d", minutes, seconds)
-
     progressLabel.text = timeString
+
+    /// Update progress bar
+    let progress = CGFloat(currentTime / totalDuration)
+    progressNeedleLeadingConstraint?.constant = view.bounds.width * progress
   }
 
   @objc
@@ -194,7 +223,7 @@ class AudioEditorViewController: UIViewController {
 
   private func resetPlaybackTimer() {
     playbackTimer?.invalidate()
-        playbackTimer = nil
+    playbackTimer = nil
   }
 
   @objc

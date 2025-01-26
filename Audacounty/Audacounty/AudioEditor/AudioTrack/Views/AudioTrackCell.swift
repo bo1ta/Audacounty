@@ -5,9 +5,9 @@
 //  Created by Solomon Alexandru on 22.01.2025.
 //
 
+import AudioEngine
 import DSWaveformImage
 import DSWaveformImageViews
-import AudioEngine
 import UIKit
 
 class AudioTrackCell: UICollectionViewCell {

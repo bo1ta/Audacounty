@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AudioTrack: Hashable, Identifiable {
+public struct AudioTrack: Hashable, Identifiable, Sendable {
   public let id: UUID
   public let url: URL
   public let duration: Double

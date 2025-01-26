@@ -28,6 +28,7 @@ public class AudioTrackEngine {
     playerNode.scheduleFile(audioFile, at: nil, completionHandler: nil)
 
     playerNodes[track.id] = playerNode
+    audioTracks.append(track)
   }
 
   public func play() {
@@ -63,7 +64,14 @@ public class AudioTrackEngine {
     }
   }
 
-  public func currentTime() -> TimeInterval? {
+  public func getTotalDuration() -> TimeInterval? {
+    guard audioTracks.count > 1 else {
+      return audioTracks.first?.duration
+    }
+    return audioTracks.max(by: { $0.duration < $1.duration })?.duration
+  }
+
+  public func getCurrentTime() -> TimeInterval? {
     guard
       let (trackID, firstPlayerNode) = playerNodes.first,
       let lastRenderTime = firstPlayerNode.lastRenderTime,

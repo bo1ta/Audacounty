@@ -22,8 +22,6 @@ class SelectionOverlayView: UIView {
 
     UIColor.systemBlue.withAlphaComponent(0.3).setFill()
     selectionPath.fill()
-
-    print("S_A DESENAT")
   }
 
   func updateSelection(start: CGPoint?, end: CGPoint?) {
