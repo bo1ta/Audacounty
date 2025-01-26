@@ -51,7 +51,7 @@ class AudioEditorViewController: UIViewController {
     return label
   }()
 
-  private lazy var progressNeedleView: UIView = {
+  private lazy var playheadView: UIView = {
     let view = UIView()
     view.backgroundColor = .red
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -90,7 +90,7 @@ class AudioEditorViewController: UIViewController {
   private let audioFilePicker: AudioFilePicker
   private var audioTracks: [AudioTrack] = []
   private var playbackTimer: Timer?
-  private var progressNeedleLeadingConstraint: NSLayoutConstraint?
+  private var playheadLeadingConstraint: NSLayoutConstraint?
 
   init(audioFilePicker: AudioFilePicker = AudioFilePicker()) {
     self.audioFilePicker = audioFilePicker
@@ -129,10 +129,10 @@ class AudioEditorViewController: UIViewController {
     view.addSubview(tracksCollectionView)
     tracksCollectionView.setupUI()
 
-    view.addSubview(progressNeedleView)
+    view.addSubview(playheadView)
 
-    progressNeedleLeadingConstraint = progressNeedleView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
-    progressNeedleLeadingConstraint?.isActive = true
+    playheadLeadingConstraint = playheadView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+    playheadLeadingConstraint?.isActive = true
 
     NSLayoutConstraint.activate([
       controlsStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
@@ -145,9 +145,9 @@ class AudioEditorViewController: UIViewController {
       tracksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
       tracksCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-      progressNeedleView.widthAnchor.constraint(equalToConstant: 2),
-      progressNeedleView.topAnchor.constraint(equalTo: tracksCollectionView.topAnchor),
-      progressNeedleView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+      playheadView.widthAnchor.constraint(equalToConstant: 2),
+      playheadView.topAnchor.constraint(equalTo: tracksCollectionView.topAnchor),
+      playheadView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
   }
 
@@ -174,7 +174,7 @@ class AudioEditorViewController: UIViewController {
   private func playAction() {
     audioEngine.play()
     schedulePlaybackTimer()
-    progressNeedleView.isHidden = false
+    playheadView.isHidden = false
   }
 
   private func updateProgressLabel() {
@@ -186,7 +186,7 @@ class AudioEditorViewController: UIViewController {
     else {
       playbackTimer?.invalidate()
       playbackTimer = nil
-      progressNeedleView.isHidden = true
+      playheadView.isHidden = true
       return
     }
 
@@ -198,7 +198,7 @@ class AudioEditorViewController: UIViewController {
 
     /// Update progress bar
     let progress = CGFloat(currentTime / totalDuration)
-    progressNeedleLeadingConstraint?.constant = view.bounds.width * progress
+    playheadLeadingConstraint?.constant = view.bounds.width * progress
   }
 
   @objc
