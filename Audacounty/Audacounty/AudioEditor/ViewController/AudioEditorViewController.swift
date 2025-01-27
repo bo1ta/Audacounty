@@ -82,6 +82,10 @@ class AudioEditorViewController: UIViewController {
       for: indexPath) as? AudioTrackCell
     if let audioTrack = self.audioTracks[safe: indexPath.item] {
       cell?.audioTrack = audioTrack
+      cell?.volumeChangeHandler = { [weak self] volume in
+        self?.audioTracks[indexPath.item].volume = volume
+        self?.audioEngine.setVolume(volume, forTrackID: audioTrack.id)
+      }
     }
     return cell
   }
@@ -129,7 +133,7 @@ class AudioEditorViewController: UIViewController {
 
     view.addSubview(playheadView)
 
-    playheadLeadingConstraint = playheadView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+    playheadLeadingConstraint = playheadView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60)
     playheadLeadingConstraint?.isActive = true
 
     NSLayoutConstraint.activate([
@@ -194,9 +198,11 @@ class AudioEditorViewController: UIViewController {
     let timeString = String(format: "%02d:%02d", minutes, seconds)
     progressLabel.text = timeString
 
-    /// Update progress bar
+    /// Update playhead position
     let progress = CGFloat(currentTime / totalDuration)
-    playheadLeadingConstraint?.constant = view.bounds.width * progress
+    let labelContainerWidth: CGFloat = 60 + 8 /// Width of the `controlsContainer`(60) + padding from the waveform (8)
+    let availableWidth = view.bounds.width - labelContainerWidth // Available width for the waveform
+    playheadLeadingConstraint?.constant = labelContainerWidth + (availableWidth * progress)
   }
 
   @objc
@@ -251,7 +257,8 @@ extension AudioEditorViewController: AudioFilePickerDelegate {
     do {
       let assetReader = try AVAssetReader(asset: AVURLAsset(url: url))
       let duration = assetReader.asset.duration.seconds
-      return AudioTrack(url: url, duration: duration)
+      let name = url.lastPathComponent
+      return AudioTrack(url: url, duration: duration, name: name)
     } catch {
       print("Failed to create audio track for url: \(url): \(error.localizedDescription)")
       return nil

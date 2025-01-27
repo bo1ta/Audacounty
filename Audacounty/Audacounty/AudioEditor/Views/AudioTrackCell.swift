@@ -11,9 +11,35 @@ import DSWaveformImageViews
 import UIKit
 
 class AudioTrackCell: UICollectionViewCell {
-  public static let reuseIdentifier = "AudioTrackCell"
+  static let reuseIdentifier = "AudioTrackCell"
   private let waveformImageDrawer = WaveformImageDrawer()
   private var originalSamples: [Float]?
+
+  private lazy var nameLabel: UILabel = {
+    let label = UILabel()
+    label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+    label.textColor = .white
+    label.translatesAutoresizingMaskIntoConstraints = false
+    return label
+  }()
+
+  private lazy var volumeSlider: UISlider = {
+    let slider = UISlider()
+    slider.minimumValue = 0.0
+    slider.maximumValue = 1.0
+    slider.value = 1.0
+    slider.addTarget(self, action: #selector(volumeChanged(_:)), for: .valueChanged)
+    slider.translatesAutoresizingMaskIntoConstraints = false
+    return slider
+  }()
+
+  private lazy var controlsContainer: UIView = {
+    let stack = UIView()
+    stack.addSubview(nameLabel)
+    stack.backgroundColor = .systemGray5
+    stack.translatesAutoresizingMaskIntoConstraints = false
+    return stack
+  }()
 
   private lazy var imageView: WaveformImageView = {
     let imageView = WaveformImageView(frame: .zero)
@@ -23,13 +49,50 @@ class AudioTrackCell: UICollectionViewCell {
     return imageView
   }()
 
+  var volumeChangeHandler: ((Float) -> Void)?
+
   var audioTrack: AudioTrack? {
     didSet {
-      guard let audioURL = audioTrack?.url else {
+      guard let audioTrack else {
         return
       }
-      imageView.waveformAudioURL = audioURL
+      nameLabel.text = audioTrack.name
+      volumeSlider.value = audioTrack.volume
+      imageView.waveformAudioURL = audioTrack.url
     }
+  }
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+
+    setupUI()
+  }
+
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  private func setupUI() {
+    contentView.addSubview(controlsContainer)
+    contentView.addSubview(imageView)
+
+    NSLayoutConstraint.activate([
+      controlsContainer.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+      controlsContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+      controlsContainer.widthAnchor.constraint(equalToConstant: 60),
+      controlsContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+
+      imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+      imageView.leadingAnchor.constraint(equalTo: controlsContainer.trailingAnchor),
+      imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+      imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+    ])
+  }
+
+  @objc
+  private func volumeChanged(_ sender: UISlider) {
+    volumeChangeHandler?(sender.value)
   }
 
   func zoomToTimeRange(start: Double, end: Double) {
@@ -57,27 +120,5 @@ class AudioTrackCell: UICollectionViewCell {
       backgroundColor: .black,
       style: .gradient([.red, .red.withAlphaComponent(0.6)]),
       verticalScalingFactor: verticalScalingFactor)
-  }
-
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-
-    setupUI()
-  }
-
-  @available(*, unavailable)
-  required init?(coder _: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  private func setupUI() {
-    contentView.addSubview(imageView)
-
-    NSLayoutConstraint.activate([
-      imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
-      imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-      imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-      imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
-    ])
   }
 }
